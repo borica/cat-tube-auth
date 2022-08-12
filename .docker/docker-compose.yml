@@ -1,0 +1,33 @@
+version: '3'
+
+networks:
+  cat-tube-network:
+    driver: bridge
+
+services:
+  auth-database:
+    container_name: authDatabase
+    image: postgres:12
+    environment:
+      - POSTGRES_DB=test
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+    command: -c "listen_addresses=*"
+    ports:
+      - "5432:5432"
+    networks:
+      - cat-tube-network
+
+  auth-api:
+    container_name: authApi
+    build:
+      context: ../
+      dockerfile: .docker/Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - "..:/var/www/app"
+    networks:
+      - cat-tube-network
+    depends_on:
+      - auth-database
